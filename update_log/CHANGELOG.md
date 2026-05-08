@@ -40,3 +40,10 @@
 ### 기타
 
 - 빌드: Bun + esbuild + TypeScript
+
+## 2026-05-09
+
+### 수정됨
+
+- 설정 UI를 좌측 내비 + 섹션 그룹 레이아웃으로 개선 (상세: [entries/2026-05-09-settings-ui-redesign.md](entries/2026-05-09-settings-ui-redesign.md))
+- 설정의 **Rescan vault**를 Maintenance 탭 **Danger zone**으로 이동 (상세: [entries/2026-05-09-settings-rescan-danger-zone.md](entries/2026-05-09-settings-rescan-danger-zone.md))

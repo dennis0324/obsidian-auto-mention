@@ -1,8 +1,123 @@
-/*
+/* Settings layout (inspired by obsidian-reamen-client) */
+div:has(.auto-mention-settings-nav) {
+	height: 100%;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.auto-mention-settings-container {
+	display: flex;
+	height: 100%;
+	gap: 0;
+}
 
-If your plugin does not need CSS, delete this file.
+.auto-mention-settings-nav {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 148px;
+	padding: 4px 12px 4px 0;
+	border-right: 1px solid var(--background-modifier-border);
+}
 
-*/
+.auto-mention-settings-nav-btn {
+	align-items: center;
+	justify-content: start;
+	background: none;
+	border: none;
+	box-shadow: none !important;
+	background-color: transparent !important;
+	color: var(--text-muted);
+	cursor: pointer;
+	display: flex;
+	font-size: var(--font-ui-small);
+	gap: 7px;
+	padding: 6px 10px;
+	text-align: left;
+	transition: color 0.1s;
+	width: 100%;
+}
+
+.auto-mention-settings-nav-btn:hover {
+	background: none;
+	color: var(--text-normal);
+}
+
+.auto-mention-settings-nav-btn.active {
+	background: none;
+	color: var(--text-accent);
+}
+
+.auto-mention-nav-icon {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+	color: inherit;
+}
+
+.auto-mention-nav-icon svg {
+	width: 15px;
+	height: 15px;
+	stroke: currentColor;
+}
+
+.auto-mention-settings-content {
+	flex: 1;
+	padding: 0 16px;
+	overflow-y: auto;
+}
+
+/* Setting group */
+.auto-mention-setting-group {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	margin: 12px 0;
+	overflow: hidden;
+}
+
+.auto-mention-setting-group-header {
+	background: var(--background-secondary);
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	padding: 6px 16px;
+	text-transform: uppercase;
+}
+
+.auto-mention-setting-group .setting-item {
+	border-top: 1px solid var(--background-modifier-border);
+	border-bottom: none;
+	border: none;
+	background: none;
+}
+
+.auto-mention-setting-group-footer {
+	align-items: center;
+	border-top: 1px solid var(--background-modifier-border);
+	display: flex;
+	gap: 10px;
+	padding: 10px 16px;
+}
+
+.auto-mention-setting-group--danger {
+	border-color: var(--background-modifier-error);
+}
+
+.auto-mention-setting-group--danger .auto-mention-setting-group-header {
+	background: var(--background-modifier-error);
+	color: var(--text-error);
+}
+
+.auto-mention-setting-group-footer--danger {
+	align-items: flex-start;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.auto-mention-danger-zone-copy {
+	flex: 1;
+	min-width: 0;
+}
+
+.auto-mention-danger-zone-copy .setting-item-name {
+	margin-bottom: 4px;
+}
