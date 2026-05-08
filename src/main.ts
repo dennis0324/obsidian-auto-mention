@@ -19,7 +19,7 @@ export default class AutoMentionPlugin extends Plugin {
 		this.addSettingTab(new AutoMentionSettingTab(this.app, this));
 
 		this.addCommand({
-			id: "auto-mention-rescan-vault",
+			id: "rescan-vault",
 			name: "Rescan vault",
 			callback: () => {
 				void this.runRescan();
