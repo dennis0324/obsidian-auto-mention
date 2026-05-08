@@ -44,5 +44,5 @@ export class AutoMentionSettingTab extends PluginSettingTab {
 }
 
 export function notifyRescanDone(): void {
-	new Notice("Auto Mention: vault rescan finished.");
+	new Notice("Vault rescan finished.");
 }

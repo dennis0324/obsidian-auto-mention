@@ -6,6 +6,7 @@
  * Skip: SKIP_CHANGELOG_CHECK=1
  */
 import { execSync } from "node:child_process";
+import process from "node:process";
 
 if (process.env.SKIP_CHANGELOG_CHECK === "1") {
 	process.exit(0);

@@ -79,7 +79,7 @@ export function readMentionSourcePathsFromContent(
 	const split = splitFrontmatter(content);
 	if (!split.hasYaml) return new Set();
 	try {
-		const data = parseYaml(split.yamlRaw);
+		const data: unknown = parseYaml(split.yamlRaw);
 		return mentionSourcePathsFromYaml(data, contextPath, app);
 	} catch {
 		return new Set();

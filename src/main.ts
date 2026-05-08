@@ -20,7 +20,7 @@ export default class AutoMentionPlugin extends Plugin {
 
 		this.addCommand({
 			id: "auto-mention-rescan-vault",
-			name: "Auto Mention: rescan vault",
+			name: "Rescan vault",
 			callback: () => {
 				void this.runRescan();
 			},
@@ -46,7 +46,7 @@ export default class AutoMentionPlugin extends Plugin {
 	async runRescan(): Promise<void> {
 		if (!this.sync) return;
 		if (!this.settings.enabled) {
-			new Notice("Auto Mention: enable sync in settings first.");
+			new Notice("Enable sync in settings first.");
 			return;
 		}
 		await this.sync.rescanVault();
