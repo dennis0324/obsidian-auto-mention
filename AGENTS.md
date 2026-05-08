@@ -242,6 +242,13 @@ this.registerInterval(window.setInterval(() => { /* ... */ }, 1000));
 - Settings not persisting: ensure `loadData`/`saveData` are awaited and you re-render the UI after changes.
 - Mobile-only issues: confirm you're not using desktop-only APIs; check `isDesktopOnly` and adjust.
 
+## Changelog (`update_log/`)
+
+- 기능·동작·설정·빌드에 영향 있는 변경 시 **요약**은 [`update_log/CHANGELOG.md`](update_log/CHANGELOG.md), **상세**는 [`update_log/entries/`](update_log/entries/) 아래 `YYYY-MM-DD-slug.md` 새 파일(템플릿: [`entries/_template.md`](update_log/entries/_template.md))로 남깁니다. CHANGELOG 항목에 `(상세: entries/…​.md)` 링크를 붙입니다.
+- `bun install`의 **`prepare`** 가 로컬 Git에 `core.hooksPath=.githooks` 를 설정하면, 커밋 시 [`scripts/check-update-log.mjs`](scripts/check-update-log.mjs) 가 `src/`·`manifest.json` 등이 스테이징된 경우 **`CHANGELOG.md` + `entries/*.md` 엔트리**까지 함께 스테이징됐는지 검사합니다.
+- 수동: `bun run changelog:check` · 예외: `SKIP_CHANGELOG_CHECK=1 git commit` (비권장)
+- 에이전트: [`.cursor/rules/update-log.mdc`](.cursor/rules/update-log.mdc)
+
 ## References
 
 - Obsidian sample plugin: https://github.com/obsidianmd/obsidian-sample-plugin

@@ -1,19 +1,24 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-auto-mention",
+	"packageManager": "bun@1.3.13",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Sync wikilink/embed mentions into target notes' frontmatter and optional reverse strip.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
+		"prepare": "node scripts/install-git-hooks.mjs",
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json",
-		"lint": "eslint ."
+		"lint": "eslint .",
+		"changelog:check": "node scripts/check-update-log.mjs"
 	},
 	"keywords": [],
 	"license": "0-BSD",
 	"devDependencies": {
 		"@types/node": "^16.11.6",
+		"@types/react": "^18.3.12",
+		"@types/react-dom": "^18.3.1",
 		"esbuild": "0.25.5",
 		"eslint-plugin-obsidianmd": "0.1.9",
 		"globals": "14.0.0",
@@ -24,6 +29,8 @@
 		"jiti": "2.6.1"
 	},
 	"dependencies": {
-		"obsidian": "latest"
+		"obsidian": "latest",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
 	}
 }

@@ -1,11 +1,9 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "obsidian-auto-mention",
+	"name": "Auto Mention",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"description": "Keeps wikilink/embed mentioners in each note's mention links frontmatter, with optional reverse strip.",
+	"author": "",
 	"isDesktopOnly": false
 }

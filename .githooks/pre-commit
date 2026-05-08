@@ -1,0 +1,5 @@
+#!/bin/sh
+# Require update_log/ when committing plugin code (see scripts/check-update-log.mjs)
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT" || exit 1
+exec node scripts/check-update-log.mjs

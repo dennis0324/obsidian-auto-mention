@@ -1,0 +1,16 @@
+---
+description: Keep update_log summary + detailed entries when changing plugin behavior or code
+alwaysApply: true
+---
+
+# update_log: 요약 + 상세
+
+`src/`·`manifest.json`·`package.json`·`esbuild.config.mjs`·`tsconfig.json`·`styles.css`·`scripts/` 를 **기능 추가·버그 수정·동작 변경** 때문에 수정했다면, **같은 작업**에서 다음을 수행합니다.
+
+1. **`update_log/CHANGELOG.md`** — 날짜 섹션에 **추가됨 / 수정됨 / 기타**로 짧게 요약하고, 상세 파일이 있으면 `(상세: entries/…​.md)` 링크를 붙입니다.
+2. **`update_log/entries/YYYY-MM-DD-slug.md`** — **새 파일**을 추가하거나, 같은 주제의 기존 엔트리를 실질적으로 갱신합니다. 내용은 `update_log/entries/_template.md`를 참고해 **배경·구현·경로·테스트** 등을 적습니다. (`README.md` / `_template.md`만 수정하는 것으로는 대체 불가)
+
+커밋 시 pre-commit이 **`CHANGELOG.md`와 `entries/*.md` 엔트리**를 함께 스테이징했는지 검사합니다.
+
+- 예외: `SKIP_CHANGELOG_CHECK=1` (비권장)
+- 플러그인 동작과 무관한 문서만 고친 경우(훅 트리거 경로 미포함)에는 위 절차가 강제되지 않습니다.
