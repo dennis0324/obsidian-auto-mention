@@ -4,11 +4,15 @@ import type AutoMentionPlugin from "../main";
 export function SettingsApp({ plugin }: { plugin: AutoMentionPlugin }) {
 	const [enabled, setEnabled] = useState(plugin.settings.enabled);
 	const [reverseSync, setReverseSync] = useState(plugin.settings.reverseSync);
+	const [mentionLinksKey, setMentionLinksKey] = useState(
+		plugin.settings.mentionLinksKey,
+	);
 	const [removeKeyWhenEmpty, setRemoveKeyWhenEmpty] = useState(
 		plugin.settings.removeMentionLinksKeyWhenEmpty,
 	);
 	const [debounceMs, setDebounceMs] = useState(plugin.settings.debounceMs);
 	const [busy, setBusy] = useState(false);
+	const keyForUi = (mentionLinksKey || "mention links").trim() || "mention links";
 
 	const persist = useCallback(async () => {
 		await plugin.saveSettings();
@@ -27,6 +31,15 @@ export function SettingsApp({ plugin }: { plugin: AutoMentionPlugin }) {
 		async (v: boolean) => {
 			setReverseSync(v);
 			plugin.settings.reverseSync = v;
+			await persist();
+		},
+		[persist, plugin],
+	);
+
+	const onMentionLinksKey = useCallback(
+		async (v: string) => {
+			setMentionLinksKey(v);
+			plugin.settings.mentionLinksKey = v;
 			await persist();
 		},
 		[persist, plugin],
@@ -64,7 +77,7 @@ export function SettingsApp({ plugin }: { plugin: AutoMentionPlugin }) {
 			<h2>Auto Mention</h2>
 			<p style={{ marginBottom: "1em", opacity: 0.85 }}>
 				Body wikilinks <code>[[…]]</code> and embeds <code>![[…]]</code> update the
-				target note&apos;s <code>mention links</code> frontmatter. Optional
+				target note&apos;s <code>{keyForUi}</code> frontmatter. Optional
 				reverse sync strips links in the source when you remove it from that
 				list.
 			</p>
@@ -88,6 +101,21 @@ export function SettingsApp({ plugin }: { plugin: AutoMentionPlugin }) {
 				/>
 				<span>Reverse sync (frontmatter removal strips body links)</span>
 			</label>
+			<label style={{ display: "block", marginBottom: 12 }}>
+				<span>
+					Frontmatter key (meta property){" "}
+					<span style={{ opacity: 0.8 }}>(default: </span>
+					<code>mention links</code>
+					<span style={{ opacity: 0.8 }}>)</span>
+				</span>
+				<input
+					type="text"
+					value={mentionLinksKey}
+					placeholder="mention links"
+					onChange={(e) => void onMentionLinksKey(e.target.value)}
+					style={{ marginLeft: 8, width: 240 }}
+				/>
+			</label>
 			<label
 				style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}
 			>
@@ -97,8 +125,8 @@ export function SettingsApp({ plugin }: { plugin: AutoMentionPlugin }) {
 					onChange={(e) => void onRemoveKeyWhenEmpty(e.target.checked)}
 				/>
 				<span>
-					Remove entire <code>mention links</code> key when the list becomes empty
-					(unchecked: keep <code>mention links: []</code>)
+					Remove entire <code>{keyForUi}</code> key when the list becomes empty
+					(unchecked: keep <code>{keyForUi}: []</code>)
 				</span>
 			</label>
 			<label style={{ display: "block", marginBottom: 12 }}>

@@ -1,2 +1,2 @@
-/** Frontmatter key used by this plugin (must match project-plan examples). */
-export const MENTION_LINKS_KEY = "mention links";
+/** Default frontmatter key used by this plugin (matches docs/examples). */
+export const DEFAULT_MENTION_LINKS_KEY = "mention links";

@@ -7,6 +7,8 @@ import { SettingsApp } from "./ui/SettingsApp";
 export interface AutoMentionSettings {
 	enabled: boolean;
 	reverseSync: boolean;
+	/** Frontmatter key to write mention entries into. */
+	mentionLinksKey: string;
 	/** When true (default), delete the `mention links` property if the list becomes empty. When false, keep the key with an empty YAML array. */
 	removeMentionLinksKeyWhenEmpty: boolean;
 	debounceMs: number;
@@ -15,6 +17,7 @@ export interface AutoMentionSettings {
 export const DEFAULT_SETTINGS: AutoMentionSettings = {
 	enabled: true,
 	reverseSync: true,
+	mentionLinksKey: "mention links",
 	removeMentionLinksKeyWhenEmpty: true,
 	debounceMs: 300,
 };

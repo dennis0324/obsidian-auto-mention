@@ -1,6 +1,5 @@
 import type { App, TFile } from "obsidian";
 import { parseYaml } from "obsidian";
-import { MENTION_LINKS_KEY } from "./constants";
 import { normalizeLinkPath } from "./paths";
 
 export type FrontmatterSplit =
@@ -56,12 +55,13 @@ export function resolveMentionEntryToPath(
 /** Resolved vault paths of notes listed under `mention links` for the given YAML object. */
 export function mentionSourcePathsFromYaml(
 	data: unknown,
+	key: string,
 	contextPath: string,
 	app: App,
 ): Set<string> {
 	const out = new Set<string>();
 	if (!data || typeof data !== "object") return out;
-	const raw = (data as Record<string, unknown>)[MENTION_LINKS_KEY];
+	const raw = (data as Record<string, unknown>)[key];
 	if (!Array.isArray(raw)) return out;
 	for (const item of raw) {
 		if (typeof item !== "string") continue;
@@ -73,6 +73,7 @@ export function mentionSourcePathsFromYaml(
 
 export function readMentionSourcePathsFromContent(
 	content: string,
+	key: string,
 	contextPath: string,
 	app: App,
 ): Set<string> {
@@ -80,7 +81,7 @@ export function readMentionSourcePathsFromContent(
 	if (!split.hasYaml) return new Set();
 	try {
 		const data: unknown = parseYaml(split.yamlRaw);
-		return mentionSourcePathsFromYaml(data, contextPath, app);
+		return mentionSourcePathsFromYaml(data, key, contextPath, app);
 	} catch {
 		return new Set();
 	}

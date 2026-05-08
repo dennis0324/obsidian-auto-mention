@@ -16,6 +16,8 @@
 - 역방향 동기화 옵션: `mention links`에서 항목 삭제 시 소스 노트 본문 링크를 일반 텍스트로 치환
 - 노트 삭제 시 관련 `mention links` 정리
 - React 기반 설정 UI (동기화 on/off, 역방향, 디바운스, 볼트 리스캔)
+- 생성되는 meta property(프론트매터) key 이름을 설정에서 변경 가능  
+  _(상세: [entries/2026-05-08-configurable-meta-property-key.md](entries/2026-05-08-configurable-meta-property-key.md))_
 - 명령: `Auto Mention: rescan vault`
 - 코드 펜스(```) 내부 링크 무시, 플러그인 쓰기 직후 역방향 루프 완화(짧은 grace)
 - `update_log/` 변경 기록 및 커밋 시 자동 검사용 Git pre-commit 훅 (`.githooks/`, `prepare`로 `core.hooksPath` 설정)

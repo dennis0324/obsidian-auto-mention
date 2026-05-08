@@ -1,6 +1,6 @@
 import { type App, type EventRef, type TAbstractFile, TFile } from "obsidian";
 import type { AutoMentionSettings } from "../settings";
-import { MENTION_LINKS_KEY } from "./constants";
+import { DEFAULT_MENTION_LINKS_KEY } from "./constants";
 import {
 	readMentionSourcePathsFromContent,
 	replaceBodyPreservingFrontmatter,
@@ -26,6 +26,12 @@ export class SyncEngine {
 	private rescanning = false;
 
 	constructor(private readonly host: AutoMentionPluginHost) {}
+
+	private getMentionLinksKey(): string {
+		const raw = this.host.settings.mentionLinksKey;
+		const key = typeof raw === "string" ? raw.trim() : "";
+		return key ? key : DEFAULT_MENTION_LINKS_KEY;
+	}
 
 	attach(register: (ref: EventRef) => void): void {
 		register(
@@ -71,6 +77,7 @@ export class SyncEngine {
 	/** Full rebuild: snapshots from disk, then forward sync (no reverse strip). */
 	async rescanVault(): Promise<void> {
 		if (!this.host.settings.enabled) return;
+		const key = this.getMentionLinksKey();
 		this.rescanning = true;
 		try {
 			const files = this.host.app.vault.getMarkdownFiles();
@@ -78,6 +85,7 @@ export class SyncEngine {
 				const content = await this.host.app.vault.read(f);
 				const cur = readMentionSourcePathsFromContent(
 					content,
+					key,
 					f.path,
 					this.host.app,
 				);
@@ -97,10 +105,12 @@ export class SyncEngine {
 
 	async processFileChange(file: TFile): Promise<void> {
 		if (!this.host.settings.enabled) return;
+		const key = this.getMentionLinksKey();
 
 		const content = await this.host.app.vault.read(file);
 		let curFmSources = readMentionSourcePathsFromContent(
 			content,
+			key,
 			file.path,
 			this.host.app,
 		);
@@ -198,6 +208,7 @@ export class SyncEngine {
 	): Promise<void> {
 		const target = this.host.app.vault.getAbstractFileByPath(targetPath);
 		if (!(target instanceof TFile)) return;
+		const key = this.getMentionLinksKey();
 		const base = wikilinkLineForSourceInTarget(source, target, this.host.app);
 		const line =
 			heading && heading.trim()
@@ -207,7 +218,7 @@ export class SyncEngine {
 		await this.host.app.fileManager.processFrontMatter(
 			target,
 			(fm: Record<string, unknown>) => {
-				const listRaw = fm[MENTION_LINKS_KEY];
+				const listRaw = fm[key];
 				const list: string[] = Array.isArray(listRaw)
 					? listRaw.filter((x): x is string => typeof x === "string")
 					: [];
@@ -232,13 +243,13 @@ export class SyncEngine {
 						list.splice(matchingIdxs[j]!, 1);
 					}
 				}
-				fm[MENTION_LINKS_KEY] = list;
+				fm[key] = list;
 			},
 		);
 		const after = await this.host.app.vault.read(target);
 		this.mentionSnapshot.set(
 			target.path,
-			readMentionSourcePathsFromContent(after, target.path, this.host.app),
+			readMentionSourcePathsFromContent(after, key, target.path, this.host.app),
 		);
 	}
 
@@ -255,11 +266,12 @@ export class SyncEngine {
 	): Promise<void> {
 		const target = this.host.app.vault.getAbstractFileByPath(targetPath);
 		if (!(target instanceof TFile)) return;
+		const key = this.getMentionLinksKey();
 		this.markPluginMutation(target.path);
 		await this.host.app.fileManager.processFrontMatter(
 			target,
 			(fm: Record<string, unknown>) => {
-				const listRaw = fm[MENTION_LINKS_KEY];
+				const listRaw = fm[key];
 				if (!Array.isArray(listRaw)) return;
 				const next = listRaw.filter((item) => {
 					if (typeof item !== "string") return true;
@@ -272,19 +284,19 @@ export class SyncEngine {
 				});
 				if (next.length === 0) {
 					if (this.host.settings.removeMentionLinksKeyWhenEmpty) {
-						delete fm[MENTION_LINKS_KEY];
+						delete fm[key];
 					} else {
-						fm[MENTION_LINKS_KEY] = [];
+						fm[key] = [];
 					}
 				} else {
-					fm[MENTION_LINKS_KEY] = next;
+					fm[key] = next;
 				}
 			},
 		);
 		const after = await this.host.app.vault.read(target);
 		this.mentionSnapshot.set(
 			target.path,
-			readMentionSourcePathsFromContent(after, target.path, this.host.app),
+			readMentionSourcePathsFromContent(after, key, target.path, this.host.app),
 		);
 	}
 }
