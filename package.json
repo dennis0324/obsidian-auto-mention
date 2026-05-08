@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-auto-mention",
 	"packageManager": "bun@1.3.13",
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"description": "Sync wikilink/embed mentions into target notes' frontmatter and optional reverse strip.",
 	"main": "main.js",
 	"type": "module",
