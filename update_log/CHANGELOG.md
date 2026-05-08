@@ -32,6 +32,8 @@
   _(상세: [entries/2026-05-08-ci-release-workflow.md](entries/2026-05-08-ci-release-workflow.md))_
 - eslint 규칙에 맞게 명령 ID에서 플러그인 ID 접두어 제거  
   _(상세: [entries/2026-05-08-fix-command-id-lint.md](entries/2026-05-08-fix-command-id-lint.md))_
+- `mention links`에 엔트리 추가 시, 링크가 헤더 섹션 안에서 발생하면 `[[Source#Heading]]` 형태로 헤더까지 포함  
+  _(상세: [entries/2026-05-08-include-heading-in-mention-links.md](entries/2026-05-08-include-heading-in-mention-links.md))_
 
 ### 기타
 

@@ -2,6 +2,7 @@ import { type App, TFile } from "obsidian";
 import { normalizeLinkPath } from "./paths";
 
 const LINK_RE = /(!?)\[\[([^\]]+)\]\]/g;
+const HEADING_LINE_RE = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
 
 /** Whether index `pos` in `body` lies inside an odd-numbered fenced ``` block. */
 export function isInsideFencedCodeBlock(body: string, pos: number): boolean {
@@ -60,6 +61,68 @@ export function resolveOutgoingLinks(
 		const file = resolveInnerToFile(inner, sourcePath, app);
 		if (file) out.add(file.path);
 	}
+	return out;
+}
+
+/**
+ * Collect resolved target paths for all wikilinks and embeds in markdown body (excludes code fences),
+ * with the first-seen enclosing markdown heading (if any).
+ *
+ * Returned `heading` is the plain heading text (no leading `#`).
+ */
+export function resolveOutgoingMentions(
+	body: string,
+	sourcePath: string,
+	app: App,
+): Map<string, { heading: string | null }> {
+	const out = new Map<string, { heading: string | null }>();
+
+	// Build "current heading from here onward" markers by line start.
+	const headingMarkers: { pos: number; heading: string }[] = [];
+	let pos = 0;
+	let inFence = false;
+	while (pos <= body.length) {
+		const nl = body.indexOf("\n", pos);
+		const lineEnd = nl === -1 ? body.length : nl;
+		const rawLine = body.slice(pos, lineEnd);
+		const trimmed = rawLine.trimEnd();
+
+		// Toggle code fences based on line-start ``` (commonmark-ish, good enough here).
+		if (/^\s*```/.test(trimmed)) {
+			inFence = !inFence;
+		} else if (!inFence) {
+			const m = trimmed.match(HEADING_LINE_RE);
+			if (m) {
+				const heading = (m[2] ?? "").trim();
+				if (heading) headingMarkers.push({ pos, heading });
+			}
+		}
+
+		if (nl === -1) break;
+		pos = nl + 1;
+	}
+
+	let markerIdx = 0;
+	let currentHeading: string | null = null;
+	let m: RegExpExecArray | null;
+	const re = new RegExp(LINK_RE);
+	while ((m = re.exec(body)) !== null) {
+		const inner = m[2];
+		if (!inner || isInsideFencedCodeBlock(body, m.index)) continue;
+
+		while (
+			markerIdx < headingMarkers.length &&
+			headingMarkers[markerIdx]!.pos <= m.index
+		) {
+			currentHeading = headingMarkers[markerIdx]!.heading;
+			markerIdx++;
+		}
+
+		const file = resolveInnerToFile(inner, sourcePath, app);
+		if (!file) continue;
+		if (!out.has(file.path)) out.set(file.path, { heading: currentHeading });
+	}
+
 	return out;
 }
 

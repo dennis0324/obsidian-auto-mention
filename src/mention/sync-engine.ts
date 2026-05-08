@@ -10,7 +10,7 @@ import {
 } from "./frontmatter";
 import {
 	replaceLinksToTargetInBody,
-	resolveOutgoingLinks,
+	resolveOutgoingMentions,
 } from "./parser";
 
 export interface AutoMentionPluginHost {
@@ -19,7 +19,7 @@ export interface AutoMentionPluginHost {
 }
 
 export class SyncEngine {
-	private readonly outgoingCache = new Map<string, Set<string>>();
+	private readonly outgoingCache = new Map<string, Map<string, string | null>>();
 	private readonly mentionSnapshot = new Map<string, Set<string>>();
 	private readonly debounceTimers = new Map<string, number>();
 	private readonly pluginMutated = new Set<string>();
@@ -57,7 +57,7 @@ export class SyncEngine {
 		if (!(file instanceof TFile) || file.extension !== "md") return;
 		const outs = this.outgoingCache.get(file.path);
 		if (outs) {
-			for (const targetPath of outs) {
+			for (const targetPath of outs.keys()) {
 				await this.removeSourcePathFromTargetFrontmatter(
 					file.path,
 					targetPath,
@@ -131,16 +131,29 @@ export class SyncEngine {
 		const latest = await this.host.app.vault.read(file);
 		const split = splitFrontmatter(latest);
 		const body = split.body;
-		const newOutgoing = resolveOutgoingLinks(
+		const newOutgoingMentions = resolveOutgoingMentions(
 			body,
 			file.path,
 			this.host.app,
 		);
-		const oldOutgoing = this.outgoingCache.get(file.path) ?? new Set<string>();
+		const newOutgoing = new Set(newOutgoingMentions.keys());
+		const oldOutgoingMentions =
+			this.outgoingCache.get(file.path) ?? new Map<string, string | null>();
+		const oldOutgoing = new Set(oldOutgoingMentions.keys());
 
 		for (const bPath of newOutgoing) {
 			if (!oldOutgoing.has(bPath)) {
-				await this.forwardAdd(file, bPath);
+				await this.forwardUpsert(
+					file,
+					bPath,
+					newOutgoingMentions.get(bPath)?.heading ?? null,
+				);
+			} else {
+				const nextHeading = newOutgoingMentions.get(bPath)?.heading ?? null;
+				const prevHeading = oldOutgoingMentions.get(bPath) ?? null;
+				if ((prevHeading ?? null) !== (nextHeading ?? null)) {
+					await this.forwardUpsert(file, bPath, nextHeading);
+				}
 			}
 		}
 		for (const bPath of oldOutgoing) {
@@ -148,7 +161,9 @@ export class SyncEngine {
 				await this.forwardRemove(file, bPath);
 			}
 		}
-		this.outgoingCache.set(file.path, new Set(newOutgoing));
+		const headingCache = new Map<string, string | null>();
+		for (const [p, v] of newOutgoingMentions) headingCache.set(p, v.heading ?? null);
+		this.outgoingCache.set(file.path, headingCache);
 	}
 
 	private markPluginMutation(path: string): void {
@@ -176,10 +191,18 @@ export class SyncEngine {
 		await this.host.app.vault.modify(source, next);
 	}
 
-	private async forwardAdd(source: TFile, targetPath: string): Promise<void> {
+	private async forwardUpsert(
+		source: TFile,
+		targetPath: string,
+		heading: string | null,
+	): Promise<void> {
 		const target = this.host.app.vault.getAbstractFileByPath(targetPath);
 		if (!(target instanceof TFile)) return;
-		const line = wikilinkLineForSourceInTarget(source, target, this.host.app);
+		const base = wikilinkLineForSourceInTarget(source, target, this.host.app);
+		const line =
+			heading && heading.trim()
+				? base.replace(/\]\]$/, `#${heading.trim()}]]`)
+				: base;
 		this.markPluginMutation(target.path);
 		await this.host.app.fileManager.processFrontMatter(
 			target,
@@ -188,12 +211,27 @@ export class SyncEngine {
 				const list: string[] = Array.isArray(listRaw)
 					? listRaw.filter((x): x is string => typeof x === "string")
 					: [];
-				const has = list.some(
-					(entry) =>
-						resolveMentionEntryToPath(entry, target.path, this.host.app) ===
-						source.path,
-				);
-				if (!has) list.push(line);
+				const matchingIdxs: number[] = [];
+				for (let i = 0; i < list.length; i++) {
+					const entry = list[i]!;
+					const resolved = resolveMentionEntryToPath(
+						entry,
+						target.path,
+						this.host.app,
+					);
+					if (resolved === source.path) matchingIdxs.push(i);
+				}
+
+				if (matchingIdxs.length === 0) {
+					list.push(line);
+				} else {
+					// Keep exactly one entry per source path; update it if heading changed.
+					const keepIdx = matchingIdxs[0]!;
+					list[keepIdx] = line;
+					for (let j = matchingIdxs.length - 1; j >= 1; j--) {
+						list.splice(matchingIdxs[j]!, 1);
+					}
+				}
 				fm[MENTION_LINKS_KEY] = list;
 			},
 		);

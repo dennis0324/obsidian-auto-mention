@@ -24,5 +24,5 @@ Obsidian 커맨드 ID는 플러그인 ID를 접두어로 포함하지 않아야 
 
 ## 확인 / 테스트
 
-- [x] `npm run lint`
-- [x] `npm run build`
+- [x] `bun run lint`
+- [x] `bun run build`
