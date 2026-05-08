@@ -1,36 +1,48 @@
-import {App, PluginSettingTab, Setting} from "obsidian";
-import MyPlugin from "./main";
+import { App, Notice, PluginSettingTab } from "obsidian";
+import { createElement } from "react";
+import { createRoot, type Root } from "react-dom/client";
+import type AutoMentionPlugin from "./main";
+import { SettingsApp } from "./ui/SettingsApp";
 
-export interface MyPluginSettings {
-	mySetting: string;
+export interface AutoMentionSettings {
+	enabled: boolean;
+	reverseSync: boolean;
+	/** When true (default), delete the `mention links` property if the list becomes empty. When false, keep the key with an empty YAML array. */
+	removeMentionLinksKeyWhenEmpty: boolean;
+	debounceMs: number;
 }
 
-export const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
+export const DEFAULT_SETTINGS: AutoMentionSettings = {
+	enabled: true,
+	reverseSync: true,
+	removeMentionLinksKeyWhenEmpty: true,
+	debounceMs: 300,
+};
 
-export class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+export class AutoMentionSettingTab extends PluginSettingTab {
+	plugin: AutoMentionPlugin;
+	private root: Root | null = null;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: AutoMentionPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
 
 	display(): void {
-		const {containerEl} = this;
-
+		const { containerEl } = this;
 		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Settings #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
+		const wrap = containerEl.createDiv();
+		this.root = createRoot(wrap);
+		this.root.render(createElement(SettingsApp, { plugin: this.plugin }));
 	}
+
+	hide(): void {
+		this.root?.unmount();
+		this.root = null;
+		super.hide();
+	}
+}
+
+export function notifyRescanDone(): void {
+	new Notice("Auto Mention: vault rescan finished.");
 }
