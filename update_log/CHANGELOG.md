@@ -26,6 +26,8 @@
 
 ### 수정됨
 
+- 플러그인 ID를 `obsidian-auto-mention` → `auto-mention`으로 변경 (`manifest.json`, `package.json`, 관련 문서/스크립트 갱신)  
+  _(상세: [entries/2026-05-08-change-plugin-id.md](entries/2026-05-08-change-plugin-id.md))_
 - CI/릴리즈: Bun 기반으로 워크플로우 통일, 태그 푸시로 GitHub Release 자동 생성, eslint 규칙에 맞게 UI 문구/스크립트 정리  
   _(상세: [entries/2026-05-08-ci-release-workflow.md](entries/2026-05-08-ci-release-workflow.md))_
 

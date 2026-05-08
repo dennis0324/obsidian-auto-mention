@@ -48,7 +48,7 @@ const entryStaged = staged.some(isCountableEntryFile);
 
 if (codeTouched && (!changelogStaged || !entryStaged)) {
 	console.error(`
-[obsidian-auto-mention] Plugin code/config is staged but update_log is incomplete.
+[auto-mention] Plugin code/config is staged but update_log is incomplete.
 
   Required (both):
     1) update_log/CHANGELOG.md  — short summary (추가됨/수정됨/기타)

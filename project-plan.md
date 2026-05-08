@@ -2,7 +2,7 @@
 
 ## 구현 상태
 
-- 플러그인 ID: `obsidian-auto-mention` ([manifest.json](manifest.json))
+- 플러그인 ID: `auto-mention` ([manifest.json](manifest.json))
 - 본문의 **위키링크** `[[…]]`와 **임베드** `![[…]]`를 대상 노트의 프론트매터 `mention links`와 동기화함.
 - 설정 UI는 **React** (`src/ui/SettingsApp.tsx`, `createRoot`).
 - 패키지 관리·빌드: **Bun** (`bun install`, `bun run build` / `bun run dev`), 번들은 esbuild.
